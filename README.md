@@ -1,6 +1,6 @@
-# Set network namespaces automatically
+# Use network namespaces for Linux desktop & shell applications
 
-This repository is intended to ease use of isolated network namespaces with Linux desktop and shell applications. The repository offers several scripts and files which
+Ease use of isolated network namespaces with Linux desktop and shell applications. This repository offers several scripts and files which
 
 - automate network namespace creation for you
 
@@ -14,7 +14,7 @@ This repository is intended to ease use of isolated network namespaces with Linu
 
 - provide launch script `netns_exec` which enforces an application to run in the selected network namespace
 
-- `ps` and `kill` command wrappers (`psns` and `killns`, respectively) for checking and killing applications running in a specific network namespace
+- `ps` and `kill` command wrappers (`psns` and `killns`, respectively) for checking and sending signals (`man 7 signal`) to applications running in a specific network namespace
 
 For automation and auto-deployment of network namespaces during system boot, I prefer [rc-local Systemd wrapper](https://aur.archlinux.org/packages/rc-local).
 
@@ -26,21 +26,20 @@ For automation and auto-deployment of network namespaces during system boot, I p
 
   - `rc.local` is optional but preferred for full automation
 
-- You should set executable bit (`chmod +x`) for files in `usr/local/bin/` and `etc/network-namespaces.d/netns_init.sh`
+- You should set executable bit (`chmod +x`) for files in [usr/local/bin/](usr/local/bin/) and for `etc/network-namespaces.d/netns_init.sh`
 
 # Examples
 
 ## Predefined network namespaces
 
-```
-nonet = No network access
-netwan = WAN access. No LAN access
-failsafe = Similar to netwan but with different DNS set
-netlocal = Host-only network access without DNS (change configuration as desired)
+| Network namespace | Description                                                            |
+|-------------------|------------------------------------------------------------------------|
+| nonet             | No network access                                                      |
+| netwan            | WAN access. No LAN access                                              |
+| failsafe          | Similar to netwan but with different DNS set                           |
+| netlocal          | Host-only network access without DNS (change configuration as desired) |
 
-```
-
-You should re-configure pre-defined network namespaces as you wish (contents of files `etc/network-namespaces.d/netns_init.sh` and `/usr/local/bin/iptables-netns`).
+You should re-configure pre-defined network namespaces as you wish (contents of files [etc/network-namespaces.d/netns_init.sh](etc/network-namespaces.d/netns_init.sh) and [usr/local/bin/iptables-netns](usr/local/bin/iptables-netns)).
 
 You should add or remove network namespaces and customize the setup for your needs.
 
