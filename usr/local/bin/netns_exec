@@ -44,5 +44,5 @@ sudo -E ip netns exec "${ns}" sudo -Eu "${USER}" sh -c "
 "
 
 # Alternative commands:
-#sudo -E ip netns exec netlocal sudo -Eu $USER "${@}"
+#sudo -E ip netns exec netlocal sudo -Eu $USER ${cmd}
 #sudo -E ip netns exec "${ns}" runuser -u "${USER}" -- ${cmd}
