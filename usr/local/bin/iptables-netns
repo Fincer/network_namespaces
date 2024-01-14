@@ -1,0 +1,25 @@
+#!/bin/env bash
+
+set -e
+set -u
+
+# Use this script as addition to iptables.service file
+
+# This script prevents application network interruptions
+# which could be caused by reloading the entire network namespace.
+
+WAN_ACCESS_IFACES="eth0 wlan0 usb0"
+
+. /etc/network-namespaces.d/netns_functions.sh
+
+ns_bindnic="${WAN_ACCESS_IFACES}"
+
+ns_hostnic="vwan0"
+set_iptables_fw_netns "localdnsrule" ${ns_hostnic} ${ns_bindnic}
+
+ns_hostnic="vwand0"
+set_iptables_fw_netns "localdnsrule" ${ns_hostnic} ${ns_bindnic}
+
+ns_bindnic="lo"
+ns_hostnic="vlocal0"
+set_iptables_fw_netns "nodnsrule" ${ns_hostnic} ${ns_bindnic}

@@ -1,0 +1,52 @@
+#!/bin/env bash
+
+set -e
+set -u
+
+# Strip down irrelevant environment variables for the current process
+
+# Get all current environment variables
+ENVVARS_ALL=( $(export -p | grep -oP '(?<=^declare -x ).*?(?==)' | tr '\n' ' ') )
+
+# Keep these environment variables
+ENVVARS_KEEP=(
+  HOME
+  SHELL
+  USER
+  PATH
+  PS1
+  LC_TIME
+  DISPLAY
+  DBUS_SESSION_BUS_ADDRESS
+  PWD
+  XDG_RUNTIME_DIR
+  XAUTHORITY
+  LANG
+  LANGUAGE
+)
+
+
+# Filter unsettable environment variables, keep ones listed above
+for var in ${ENVVARS_ALL[@]}
+do
+
+  seen=0
+  for keep in ${ENVVARS_KEEP[@]}
+  do
+
+    if [[ $var == $keep ]]
+    then
+      seen=1
+    fi
+
+  done
+
+  if [[ $seen == 0 ]]
+  then
+    unset $var
+  fi
+
+done
+
+# Set PATH
+export PATH="/usr/bin:/usr/local/bin"
