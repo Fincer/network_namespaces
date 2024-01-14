@@ -1,4 +1,4 @@
-# Use network namespaces for Linux desktop & shell applications
+# Network namespaces for Linux desktop & shell applications
 
 Ease use of isolated network namespaces with Linux desktop and shell applications. This repository offers several scripts and files which
 
@@ -6,15 +6,15 @@ Ease use of isolated network namespaces with Linux desktop and shell application
 
   - iptables-based firewall rules are automatically configured for your network namespaces
 
-    - restarting `iptables` Systemd service unit should preserve your network namespace rules when unit `override.conf` is applied
+    - restarting `iptables` Systemd service unit should preserve your network namespace rules when provided unit [override.conf file](etc/systemd/system/iptables.service.d/override.conf) is applied
 
-      - NOTE: you should configure contents `/usr/local/bin/iptables-netns` to match configuration in your `/etc/network-namespaces.d/netns_init.sh` file
+      - NOTE: you should configure contents [usr/local/bin/iptables-netns](usr/local/bin/iptables-netns) to match configuration of your [/etc/network-namespaces.d/netns_init.sh](etc/network-namespaces.d/netns_init.sh) file
 
   - you can re-apply network namespace configuration by re-executing `/etc/network-namespaces.d/netns_init.sh`
 
-- provide launch script `netns_exec` which enforces an application to run in the selected network namespace
+- provide launch script [netns_exec](usr/local/bin/netns_exec) which enforces an application to run in the selected network namespace
 
-- `ps` and `kill` command wrappers (`psns` and `killns`, respectively) for checking and sending signals (`man 7 signal`) to applications running in a specific network namespace
+- `ps` and `kill` command wrappers ([psns](usr/local/bin/psns) and [killns](usr/local/bin/killns), respectively) for checking and sending signals (`man 7 signal`) to applications running in a specific network namespace
 
 For automation and auto-deployment of network namespaces during system boot, I prefer [rc-local Systemd wrapper](https://aur.archlinux.org/packages/rc-local).
 
