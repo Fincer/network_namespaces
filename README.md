@@ -56,7 +56,7 @@ netns_exec nonet vlc
 (NOTE: This can be also be achieved via native Flatpak network access/permission control)
 
 ```
-netns_exec nonet netwan /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/steam --file-forwarding com.valvesoftware.Steam
+netns_exec nonet /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/steam --file-forwarding com.valvesoftware.Steam
 ```
 
 - Flatpak application (Discord), run in `netwan` namespace:
