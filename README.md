@@ -1,24 +1,32 @@
 # Set network namespaces automatically
 
-This repository is intended to ease use of isolated network namespaces with Linux desktop applications. The repository offers several scripts and files which
+This repository is intended to ease use of isolated network namespaces with Linux desktop and shell applications. The repository offers several scripts and files which
 
 - automate network namespace creation for you
-  - iptables-based firewall rules are automatically configured for network namespaces
-  - you can re-apply network namespace configuration, too
 
-- provide launch script `netns_exec` which enforces application to run in selected network namespace
+  - iptables-based firewall rules are automatically configured for your network namespaces
 
-- `ps` and `kill`  command wrappers (`psns` and `killns`, respectively) for checking and killing applications running in a specific network namespace
+    - restarting `iptables` Systemd service unit should preserve your network namespace rules when unit `override.conf` is applied
 
-For automation and auto-deployment of desired network namespaces during system boot, I prefer [rc-local systemd wrapper](https://aur.archlinux.org/packages/rc-local).
+      - NOTE: you should configure contents `/usr/local/bin/iptables-netns` to match configuration in your `/etc/network-namespaces.d/netns_init.sh` file
+
+  - you can re-apply network namespace configuration by re-executing `/etc/network-namespaces.d/netns_init.sh`
+
+- provide launch script `netns_exec` which enforces an application to run in the selected network namespace
+
+- `ps` and `kill` command wrappers (`psns` and `killns`, respectively) for checking and killing applications running in a specific network namespace
+
+For automation and auto-deployment of network namespaces during system boot, I prefer [rc-local Systemd wrapper](https://aur.archlinux.org/packages/rc-local).
 
 # Deployment
 
-- Deploy repository snippet files using the directory hierarchy shown here
+- You should deploy repository snippet files using the directory hierarchy shown here
 
-- The functionality depends on `iptables`, `sudo`. `rc.local` is preferred, too
+- `bash`, `iptables` and `sudo` are required
 
-- Set executable bit for files in `usr/local/bin/` and `etc/network-namespaces.d/netns_init.sh`
+  - `rc.local` is optional but preferred for full automation
+
+- You should set executable bit (`chmod +x`) for files in `usr/local/bin/` and `etc/network-namespaces.d/netns_init.sh`
 
 # Examples
 
@@ -32,31 +40,33 @@ netlocal = Host-only network access without DNS (change configuration as desired
 
 ```
 
-You should configure pre-defined network namespaces as you wish (file `etc/network-namespaces.d/netns_init.sh`). You should add or remove network namespaces and customize the setup for your needs.
+You should re-configure pre-defined network namespaces as you wish (contents of files `etc/network-namespaces.d/netns_init.sh` and `/usr/local/bin/iptables-netns`).
 
-## Running application in specific network namespace, examples
+You should add or remove network namespaces and customize the setup for your needs.
 
-### Generic application, run in "nonet" namespace (no network access):
+## Desktop applications, usage examples
+
+- Generic application (VLC), run in `nonet` namespace (no network access):
 
 ```
 netns_exec nonet vlc
 ```
 
-### Flatpak application, run in "nonet" namespace (no network access):
+- Flatpak application (Valve Steam), run in `nonet` namespace (no network access):
 
-(NOTE: This can be also be achieved via Flatpak network access control)
+(NOTE: This can be also be achieved via native Flatpak network access/permission control)
 
 ```
 netns_exec nonet netwan /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/steam --file-forwarding com.valvesoftware.Steam
 ```
 
-### Flatpak application, run in "netwan" namespace
+- Flatpak application (Discord), run in `netwan` namespace:
 
 ```
 netns_exec netwan /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=com.discordapp.Discord com.discordapp.Discord
 ```
 
-### Flatpak application, run in "failsafe" namespace
+- Flatpak application (Firefox), run in `failsafe` namespace:
 
 ```
 netns_exec failsafe /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=firefox --file-forwarding org.mozilla.firefox
