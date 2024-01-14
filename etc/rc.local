@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+/etc/network-namespaces.d/netns_init.sh
+
+exit 0
