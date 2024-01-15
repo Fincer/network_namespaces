@@ -3,15 +3,14 @@
 set -e
 set -u
 
+. /etc/network-namespaces.d/netns_functions.sh
+
 # Use this script as addition to iptables.service file
 
 # This script prevents application network interruptions
 # which could be caused by reloading the entire network namespace.
 
 WAN_ACCESS_IFACES="eth0 wlan0 usb0"
-
-. /etc/network-namespaces.d/netns_functions.sh
-
 ns_bindnic="${WAN_ACCESS_IFACES}"
 
 ns_hostnic="vwan0"
