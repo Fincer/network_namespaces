@@ -33,16 +33,4 @@ then
   cmd="dbus-launch ${cmd}"
 fi
 
-# SUDO variables must be unset because flatpak checks for sudo presence
-# and prevents running itself when they are present.
-sudo -E ip netns exec "${ns}" sudo -Eu "${USER}" sh -c "
-  unset SUDO_GID;
-  unset SUDO_UID;
-  unset SUDO_USER;
-  unset SUDO_COMMAND;
-  ${cmd}
-"
-
-# Alternative commands:
-#sudo -E ip netns exec netlocal sudo -Eu $USER ${cmd}
-#sudo -E ip netns exec "${ns}" runuser -u "${USER}" -- ${cmd}
+sudo -E ip netns exec "${ns}" runuser -u "${USER}" -- ${cmd}
