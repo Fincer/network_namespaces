@@ -1,28 +1,55 @@
 #!/bin/env bash
 
-NAMESPACES=( $(ls /run/netns) )
+set -e
+set -u
 
-# TODO: use getopts
-if [[ ${1} =~ ^(\-h|\-\-help)$ ]]
-then
-  echo "
-List processes in non-default namespaces.
-"
-  exit 0
-fi
+usage() {
+  echo "$0: List processes in non-default namespaces."
+}
 
-printf "%-25s%-20s%-20s%s%-15s%-30s%s\n" "USER" "PID" "COMMAND" "NAMESPACE"
-echo "--------------------------------------------------------------------------"
+run() {
 
-for namespace in ${NAMESPACES[@]}
-do
+  local namespaces
 
-  for pid in $(sudo ip netns pids ${namespace})
+  sudo -v
+
+  [[ ! -d /run/netns ]] && exit 0
+  namespaces=( $(find /run/netns -mindepth 1 -maxdepth 1 -type f -exec basename {} \;) )
+
+  printf "%-25s%-20s%-20s%s%-15s%-30s%s\n" "USER" "PID" "COMMAND" "NAMESPACE"
+  echo "--------------------------------------------------------------------------"
+  for namespace in "${namespaces[@]}"
   do
-
-    printf "%-25s%-20s%-20s%s%-15s%-30s%s\n" $(ps -q ${pid} -o uname,pid,comm= | tail -1) ${namespace}
+    for pid in $(sudo ip netns pids "${namespace}")
+    do
+      printf "%-25s%-20s%-20s%s%-15s%-30s%s\n" $(ps -q "${pid}" -o uname,pid,comm= | tail -1) "${namespace}"
+    done
   done
+  echo -e "\nTo alter a process, use: killns"
 
+}
+
+while getopts "h-:" opt
+do
+  case "${opt}" in
+    -)
+      case "${OPTARG}" in
+        help)
+          usage
+          exit 0
+          ;;
+      esac
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
 done
+shift $((OPTIND - 1))
 
-echo "To alter a process, use: $(killns)"
+run

@@ -1,23 +1,59 @@
 #!/bin/env bash
 
-# TODO: use getopts
-if [[ ${1} =~ ^(\-h|\-\-help)$ ]] || [[ -z ${1} ]]
-then
-  echo "
-usage: $(basename $0) <signal> <processname> <namespace>
-"
-  exit 0
-fi
+set -e
+set -u
 
-signal="${1}"
-processname="${2}"
-namespace="${3}"
+usage() {
+  echo "usage: $(basename $0) <signal> <processname> <namespace>"
+}
 
-for pid in $(sudo ip netns pids ${namespace}); do
+run() {
+  local signal="${1}"
+  local processname="${2}"
+  local namespace="${3}"
 
-  if [[ $(sudo ps -q $pid -o command) =~ ^.*${processname}.* ]]
+  if [[ ! ${signal} =~ ^[0-9]+$ ]]
   then
-    sudo ip netns exec ${namespace} kill -${signal} ${pid}
+    echo "Signal must be an integer"
+    exit 1
   fi
 
+  for pid in $(sudo ip netns pids "${namespace}")
+  do
+    if [[ $(sudo ps -q "${pid}" -o command) =~ ^.*${processname}.* ]]
+    then
+      sudo ip netns exec "${namespace}" kill -${signal} "${pid}"
+    fi
+  done
+}
+
+while getopts "h-:" opt
+do
+  case "${opt}" in
+    -)
+      case "${OPTARG}" in
+        help)
+          usage
+          exit 0
+          ;;
+      esac
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
 done
+shift $((OPTIND - 1))
+
+if [[ ${#} -eq 3 ]]
+then
+  run "${1}" "${2}" "${3}"
+else
+  usage
+  exit 1
+fi
