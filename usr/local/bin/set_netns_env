@@ -3,49 +3,45 @@
 set -e
 set -u
 
-# Strip down irrelevant environment variables for the current process
+# Delete all but selected environment
+# variables from the current process
 
 # Get all current environment variables
 ENVVARS_ALL=( $(export -p | grep -oP '(?<=^declare -x ).*?(?==)' | tr '\n' ' ') )
 
 # Keep these environment variables
 ENVVARS_KEEP=(
-  HOME
-  SHELL
-  USER
-  PATH
-  PS1
-  LC_TIME
-  DISPLAY
   DBUS_SESSION_BUS_ADDRESS
-  PWD
-  XDG_RUNTIME_DIR
-  XAUTHORITY
+  DISPLAY
+  EDITOR
+  HOME
   LANG
   LANGUAGE
+  LC_ALL
+  LC_MEASUREMENT
+  LC_NUMERIC
+  LC_TIME
+  LOCALE
+  PATH
+  PS1
+  PWD
+  SHELL
+  USER
+  XAUTHORITY
+  XDG_RUNTIME_DIR
 )
 
 
-# Filter unsettable environment variables, keep ones listed above
-for var in ${ENVVARS_ALL[@]}
+# Filter environment variables
+# Keep ones listed above if they are declared
+for var in "${ENVVARS_ALL[@]}"
 do
-
   seen=0
-  for keep in ${ENVVARS_KEEP[@]}
+  for keep in "${ENVVARS_KEEP[@]}"
   do
-
-    if [[ $var == $keep ]]
-    then
-      seen=1
-    fi
-
+    [[ "${var}" == "${keep}" ]] && seen=1
   done
-
-  if [[ $seen == 0 ]]
-  then
-    unset $var
-  fi
-
+  [[ $seen -eq 0 ]] && unset "${var}"
 done
 
 # Set PATH
