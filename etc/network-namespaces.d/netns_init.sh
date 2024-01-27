@@ -3,13 +3,15 @@
 set -e
 set -u
 
+_dir=$(dirname "${0}")
+
 # Ref: https://lwn.net/Articles/580893/
 
 # NOTE: DNS name resolution (resolv.conf) is found at /etc/netns/${namespace}/resolv.conf
 
 WAN_ACCESS_IFACES="eth0 wlan0 usb0"
 
-. netns_functions.sh
+. "${_dir}/netns_functions.sh"
 
 #####
 # Local-only namespace, no network access.
